@@ -1,0 +1,94 @@
+{
+  "model_kind": "tfidf_lr",
+  "policy": {
+    "classification_threshold": 0.5,
+    "threshold_objective": "max_macro_f1",
+    "threshold_feasible": true,
+    "routing_low": 0.4,
+    "routing_high": 0.6,
+    "routing_objective": "max_coverage",
+    "routing_feasible": true,
+    "notes": []
+  },
+  "contract": {
+    "schema_version": "1",
+    "contract_version": "1.0",
+    "name": "support_demo",
+    "positive": {
+      "name": "needs_human",
+      "definition": "The customer message requires a human agent: a complaint, refund/chargeback dispute, account security or fraud concern, legal or regulatory threat, explicit request for a person, or a problem an automated response cannot safely resolve.\n",
+      "examples": [
+        "I was charged twice and want a refund now",
+        "Someone logged into my account from another country"
+      ]
+    },
+    "negative": {
+      "name": "auto_handle",
+      "definition": "Routine informational or transactional requests that a templated or automated reply can resolve: order status, password reset instructions, store hours, shipping times, how-to questions.\n",
+      "examples": [
+        "Where is my order?",
+        "How do I reset my password?"
+      ]
+    },
+    "ambiguous_cases": [
+      "Mild frustration about a routine question is negative unless the customer asks for a person or a refund.",
+      "A repeated unresolved question is positive."
+    ],
+    "categories": {
+      "allowed": [
+        "billing",
+        "shipping",
+        "account",
+        "technical",
+        "general"
+      ],
+      "required": false
+    },
+    "classification_threshold": {
+      "objective": "max_macro_f1",
+      "fixed_threshold": null,
+      "min_positive_recall": 0.8
+    },
+    "routing_policy": {
+      "objective": "max_coverage",
+      "second_tier": "rule",
+      "rules": [
+        {
+          "name": "asks_for_human",
+          "label": 1,
+          "patterns": [
+            "\\b(human|real person|agent|manager|supervisor)\\b"
+          ],
+          "category": "general"
+        },
+        {
+          "name": "fraud_or_hacked",
+          "label": 1,
+          "patterns": [
+            "\\bhacked\\b",
+            "\\bfraud\\b",
+            "unauthori[sz]ed"
+          ],
+          "category": "account"
+        }
+      ],
+      "max_auto_error_rate": 0.1,
+      "max_missed_positive_rate": 0.1,
+      "min_band_width": 0.2,
+      "fallback": "review"
+    }
+  },
+  "run_id": null,
+  "snapshot_id": "bundled",
+  "contract_hash": "f590cfddfdac4797538b3413437731ace9cb7ced7ecb5b450fe0b99182524a3b",
+  "preprocessing": {
+    "lowercase": true,
+    "collapse_whitespace": true,
+    "strip_urls": false,
+    "max_chars": 2000
+  },
+  "class_mapping": {
+    "0": "auto_handle",
+    "1": "needs_human"
+  }
+}

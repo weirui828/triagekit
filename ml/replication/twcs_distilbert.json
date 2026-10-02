@@ -1,0 +1,82 @@
+{
+  "name": "twcs_distilbert_in_domain",
+  "captured_on": "2026-09-13",
+  "source": {
+    "repository": "human-loop (local checkout ~/dev/human-loop, commit dd256a6)",
+    "files": [
+      "notebooks/04_twcs_distilbert.ipynb",
+      "src/distilbert_utils.py",
+      "src/twcs/train_twcs.py",
+      "src/twcs/prompts.py",
+      "models/twcs/distilbert/twcs_distilbert_metrics.json",
+      "models/twcs/tfidf/twcs_metrics.json"
+    ]
+  },
+  "dataset": {
+    "file": "data/twcs/llm_labeled_5k.csv",
+    "sha256": "b94f9cf9658011d60656d3da9b466ace832779eaa410eeb769e4153376334f11",
+    "rows": 5000,
+    "columns": ["thread_id", "escalated", "category", "reason", "labeler", "turn_count", "first_customer_text"],
+    "feature_column": "first_customer_text",
+    "label_column": "escalated",
+    "label_counts": {"0": 3471, "1": 1529},
+    "category_counts": {"self_service": 3471, "complaint": 759, "payment_issue": 281, "contact_customer_service": 169, "registration_problems": 125, "get_refund": 112, "contact_human_agent": 65, "check_cancellation_fee": 18},
+    "labeler": "claude-opus-5-in-thread",
+    "label_provenance": "LLM output under the contract in src/twcs/prompts.py, one uniform random sample of 5000 reconstructed threads (seed 20260729); not human ground truth. Every score below measures agreement with those labels.",
+    "sample_manifest": "data/twcs/sample_pool_5000.txt is referenced by the original repo but is not present in the checkout; the labeled file itself is the authoritative sample."
+  },
+  "split": {
+    "protocol": "sklearn.model_selection.train_test_split(X, y, test_size=0.20, random_state=42, stratify=y) in file order, then train_test_split(X_train_full, y_train_full, test_size=0.10, random_state=42, stratify=y_train_full). Row level; one thread per row.",
+    "sizes": {"train": 3600, "validation": 400, "test": 1000},
+    "train_ids_sha256": "73e29593ae33aaefaa298979ae3aab2cfe0ed52e9ecc29f4eb0a0b5181609c49",
+    "validation_ids_sha256": "1707d33b63dc239006571060fe1b08b7e2a46256e792d2e9cc99b7aaa958128e",
+    "test_ids_sha256": "ec767c7b32d07c4bbaa774b01669789d7a4151f44b5a946e3ce0b8946410ebbf",
+    "split_manifest_sha256": "1758cda1a669314eb5b9f9209940b26313281322b7fd3bfb33ece7e57ad86d61",
+    "leakage_check": "Reproduced on 2026-09-13: 2 duplicate first_customer_text values (5 rows) all fall in train; no text appears in more than one split; one row per thread so no conversation leakage. The original split is therefore usable as-is; no corrected grouped split is required."
+  },
+  "preprocessing": {
+    "text": "raw first_customer_text with NaN -> empty string; no lowercasing, whitespace collapsing, URL stripping or truncation outside the tokenizer",
+    "tokenizer": "distilbert-base-uncased WordPiece (lowercases internally), truncation=True, max_length=128, dynamic padding per batch"
+  },
+  "model": {
+    "checkpoint": "distilbert-base-uncased",
+    "head": "AutoModelForSequenceClassification(num_labels=2), fresh classification head",
+    "loss": "CrossEntropyLoss with sklearn-style balanced class weights computed on the training labels"
+  },
+  "hyperparameters": {
+    "epochs": 4, "batch_size": 16, "eval_batch_size": 32, "learning_rate": 3e-05, "max_length": 128,
+    "warmup_ratio": 0.1, "weight_decay": 0.01, "optimizer": "torch AdamW", "scheduler": "OneCycleLR(max_lr=lr, pct_start=warmup_ratio, anneal_strategy='linear') over all steps",
+    "grad_clip_norm": 1.0, "class_weighted_loss": true, "train_shuffle": true
+  },
+  "selection": {
+    "learning_rate": "swept over [2e-05, 3e-05, 5e-05] with seed 42 on validation macro F1 at threshold 0.5; 3e-05 selected (val 0.8282, epochs best 3)",
+    "epoch": "model state from the epoch with the best validation macro F1 at threshold 0.5 is restored (seed 42: epoch 3)",
+    "threshold": "fixed 0.5 for every reported figure; the notebook's threshold sweep on the test set is analysis only and was not used for selection"
+  },
+  "metric": {
+    "definition": "sklearn f1_score(y_test, prob >= 0.5, average='macro') on the 1000-row test split",
+    "triagekit_equivalent": "ClassificationMetrics.macro_f1 with contract classification_threshold.objective=fixed, fixed_threshold=0.5; metrics_version 1"
+  },
+  "reported": {
+    "per_seed_test_macro_f1": {"42": 0.7842, "1337": 0.7967, "2024": 0.8097},
+    "mean_macro_f1": 0.7969,
+    "std_macro_f1": 0.0128,
+    "seed42": {"best_epoch": 3, "best_val_macro_f1": 0.8282, "test": {"macro_f1": 0.7842, "roc_auc": 0.883, "accuracy": 0.825, "recall_escalated": 0.6373, "precision_escalated": 0.7529, "confusion": {"tn": 630, "fp": 64, "fn": 111, "tp": 195}}, "train_duration_sec": 222.0},
+    "verified": "2026-09-13: reconstructed split and re-scored the saved seed-42 weights (models/twcs/distilbert) with the original environment: macro F1 0.7842, confusion tn 630 fp 64 fn 111 tp 195, exact match."
+  },
+  "tfidf_reference": {
+    "protocol": "same first 80/20 stratified split only (4000 train / 1000 test, no validation slice); TfidfVectorizer(max_features=10000, ngram_range=(1,2), stop_words='english', sublinear_tf=True) + LogisticRegression(class_weight='balanced', C=1.0, max_iter=1000, lbfgs, random_state=42); threshold 0.5",
+    "test_macro_f1": 0.7327,
+    "verified": "2026-09-13: re-scored saved models/twcs/tfidf/tfidf_twcs.pkl on the reconstructed test split: 0.7327, exact match."
+  },
+  "environment": {
+    "python": "3.14.6", "torch": "2.13.0", "transformers": "5.14.1", "scikit-learn": "1.8.0",
+    "device": "Apple Silicon MPS (README states M3 Pro)",
+    "determinism": "MPS fine-tuning is not bit-deterministic; the original README reports about 0.005 macro F1 variation between re-runs"
+  },
+  "tolerance": {
+    "per_seed_abs": 0.02,
+    "three_seed_mean_abs": 0.015,
+    "justification": "Observed seed-to-seed std is 0.0128 (range 0.7842 to 0.8097, 0.0255 wide) and the original author reports about 0.005 non-determinism per re-run on MPS. A single-seed replication is judged against that seed's own reported figure with an absolute tolerance of 0.02 (roughly 1.5 std plus re-run noise). A three-seed mean is judged against 0.7969 with 0.015 (the standard error of a three-seed mean is 0.0074; 0.015 is about two of those). Replication under a different torch/transformers version, Python version or device is reported with those differences listed and is not upgraded to an exact-environment claim."
+  }
+}

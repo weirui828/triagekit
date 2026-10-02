@@ -1,0 +1,37 @@
+{
+  "name": "triagekit-web",
+  "version": "0.1.0",
+  "private": true,
+  "scripts": {
+    "dev": "next dev -H 127.0.0.1",
+    "build": "next build",
+    "start": "next start -H 127.0.0.1",
+    "lint": "eslint",
+    "typecheck": "tsc --noEmit",
+    "test": "vitest run",
+    "db:migrate": "tsx scripts/migrate.ts",
+    "gen:types": "openapi-typescript ../ml/openapi.json --default-non-nullable=false -o src/generated/ml-api.d.ts",
+    "check:types": "openapi-typescript ../ml/openapi.json --default-non-nullable=false -o /tmp/triagekit-ml-api.d.ts && diff -q /tmp/triagekit-ml-api.d.ts src/generated/ml-api.d.ts"
+  },
+  "dependencies": {
+    "@libsql/client": "0.18.0",
+    "drizzle-orm": "0.44.6",
+    "next": "16.3.5",
+    "react": "19.2.8",
+    "react-dom": "19.2.8",
+    "yaml": "2.8.2"
+  },
+  "devDependencies": {
+    "@types/node": "^20",
+    "@types/react": "^19",
+    "@types/react-dom": "^19",
+    "drizzle-kit": "0.31.5",
+    "eslint": "^9",
+    "eslint-config-next": "16.3.5",
+    "openapi-typescript": "7.9.1",
+    "tsx": "4.20.6",
+    "typescript": "^5",
+    "vitest": "3.2.4"
+  },
+  "packageManager": "pnpm@10.32.1"
+}

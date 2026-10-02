@@ -1,0 +1,77 @@
+{
+  "note": "DEMO artifact trained on synthetic templated data; metrics are not evidence for real datasets",
+  "built_at": "2026-09-13T20:40:27+00:00",
+  "dataset": "support_demo.csv",
+  "dataset_sha256": "68d63c01cb837fb25492ee6e6355f5d20e0ea8aed64dcedc4c92e402eb01f930",
+  "contract_version": "1.0",
+  "contract_hash": "f590cfddfdac4797538b3413437731ace9cb7ced7ecb5b450fe0b99182524a3b",
+  "seed": 42,
+  "split_counts": {
+    "test": 24,
+    "train": 113,
+    "validation": 24
+  },
+  "policy": {
+    "classification_threshold": 0.5,
+    "threshold_objective": "max_macro_f1",
+    "threshold_feasible": true,
+    "routing_low": 0.4,
+    "routing_high": 0.6,
+    "routing_objective": "max_coverage",
+    "routing_feasible": true,
+    "notes": []
+  },
+  "metrics": {
+    "validation": {
+      "n": 23,
+      "macro_f1": 1.0,
+      "positive_precision": 1.0,
+      "positive_recall": 1.0,
+      "positive_f1": 1.0,
+      "accuracy": 1.0,
+      "confusion": {
+        "tn": 15,
+        "fp": 0,
+        "fn": 0,
+        "tp": 8
+      },
+      "categories": []
+    },
+    "test": {
+      "n": 24,
+      "macro_f1": 0.9142857142857144,
+      "positive_precision": 0.8181818181818182,
+      "positive_recall": 1.0,
+      "positive_f1": 0.9,
+      "accuracy": 0.9166666666666666,
+      "confusion": {
+        "tn": 13,
+        "fp": 2,
+        "fn": 0,
+        "tp": 9
+      },
+      "categories": []
+    },
+    "test_routing": {
+      "n": 24,
+      "low": 0.4,
+      "high": 0.6,
+      "auto_decided": 14,
+      "coverage": 0.5833333333333334,
+      "auto_errors": 0,
+      "auto_error_rate": 0.0,
+      "positives_total": 9,
+      "positives_auto_handled": 0,
+      "missed_positive_rate": 0.0,
+      "model_errors_total": 2,
+      "model_errors_in_band": 2,
+      "errors_captured_by_band": 1.0,
+      "review_count": 10
+    }
+  },
+  "dependency_versions": {
+    "scikit-learn": "1.9.1",
+    "numpy": "2.5.3",
+    "mlflow": "3.16.0"
+  }
+}

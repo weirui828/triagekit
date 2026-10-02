@@ -1,0 +1,41 @@
+# Local CPU stack. Everything binds to localhost; only the web port is published.
+services:
+  mlflow:
+    image: ghcr.io/mlflow/mlflow:v3.16.0
+    command: >
+      mlflow server --host 0.0.0.0 --port 5000
+      --backend-store-uri sqlite:////data/mlflow.db
+      --default-artifact-root /data/mlruns
+    volumes: ["triagekit-data:/data"]
+    ports: ["127.0.0.1:5000:5000"]   # tracking UI for the developer; not embedded in the product
+    healthcheck:
+      test: ["CMD", "python", "-c", "import urllib.request;urllib.request.urlopen('http://127.0.0.1:5000/health')"]
+      interval: 5s
+      retries: 20
+
+  ml:
+    build: ./ml
+    environment:
+      TRIAGEKIT_DATA_DIR: /data
+      MLFLOW_TRACKING_URI: http://mlflow:5000
+      MLFLOW_ARTIFACT_ROOT: /data/mlruns
+      MLFLOW_DISABLE_AGENT_HINT: "1"
+      TRIAGEKIT_LLM_ENABLED: ${TRIAGEKIT_LLM_ENABLED:-0}
+      TRIAGEKIT_LLM_MODEL: ${TRIAGEKIT_LLM_MODEL:-claude-opus-5}
+      ANTHROPIC_API_KEY: ${ANTHROPIC_API_KEY:-}
+    volumes: ["triagekit-data:/data"]
+    depends_on:
+      mlflow: { condition: service_healthy }
+    expose: ["8000"]
+
+  web:
+    build: ./web
+    environment:
+      ML_API_URL: http://ml:8000
+      TRIAGEKIT_DB: /data/app.db
+    volumes: ["triagekit-data:/data"]
+    depends_on: [ml]
+    ports: ["127.0.0.1:3000:3000"]
+
+volumes:
+  triagekit-data:

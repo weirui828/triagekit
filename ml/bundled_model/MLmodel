@@ -1,0 +1,27 @@
+flavors:
+  python_function:
+    artifacts:
+      package:
+        path: artifacts/pkg
+        uri: /var/folders/yj/cww74h8d1c74yrkwh_9hns0h0000gn/T/tmp5jjq4ej9/pkg
+    cloudpickle_version: 3.1.2
+    code: null
+    env:
+      conda: conda.yaml
+      virtualenv: python_env.yaml
+    loader_module: mlflow.pyfunc.model
+    python_model: python_model.pkl
+    python_version: 3.12.13
+    streamable: false
+is_signature_from_type_hint: true
+mlflow_version: 3.16.0
+model_id: null
+model_size_bytes: 29772
+model_uuid: 0ed881e831ee4259b4971120d579422c
+prompts: null
+signature:
+  inputs: '[{"type": "string", "required": true}]'
+  outputs: '[{"type": "any", "required": true}]'
+  params: null
+type_hint_from_example: false
+utc_time_created: '2026-09-13 20:40:27.140854'

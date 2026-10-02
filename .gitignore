@@ -1,0 +1,18 @@
+# shared local volume (app db, snapshots, jobs, mlflow)
+/data/
+.env
+
+# python
+ml/.venv/
+ml/**/__pycache__/
+ml/.pytest_cache/
+ml/dist/
+
+# node / next
+web/node_modules/
+web/.next/
+web/out/
+web/next-env.d.ts
+web/*.tsbuildinfo
+
+.DS_Store

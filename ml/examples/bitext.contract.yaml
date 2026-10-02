@@ -1,0 +1,27 @@
+# Bitext customer-support intents mapped to binary escalation with the human-loop rule (7 escalated intents).
+schema_version: "1"
+contract_version: "bitext-1.0"
+name: bitext_escalation
+positive:
+  name: escalated
+  definition: >
+    Intent is one of contact_human_agent, contact_customer_service, complaint, payment_issue, get_refund,
+    check_cancellation_fee or registration_problems: a human agent has to act.
+  examples: ["I want to talk to a real person", "I was charged twice"]
+negative:
+  name: self_service
+  definition: >
+    Any other Bitext intent: order, shipping, account, invoice and policy requests a bot can complete.
+  examples: ["where is my order", "how do I change my shipping address"]
+ambiguous_cases:
+  - "Labels are rule-mapped from intents; the text itself was never judged. Password resets and invoice lookups are 0 here even though a real lockout or double charge is 1 in TWCS."
+categories:
+  allowed: [cancel_order, change_order, change_shipping_address, check_cancellation_fee, check_invoice, check_payment_methods, check_refund_policy, complaint, contact_customer_service, contact_human_agent, create_account, delete_account, delivery_options, delivery_period, edit_account, get_invoice, get_refund, newsletter_subscription, payment_issue, place_order, recover_password, registration_problems, review, set_up_shipping_address, switch_account, track_order, track_refund]
+  required: true
+classification_threshold:
+  objective: max_macro_f1
+routing_policy:
+  objective: max_coverage
+  max_auto_error_rate: 0.05
+  max_missed_positive_rate: 0.05
+  fallback: review

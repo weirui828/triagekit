@@ -1,0 +1,45 @@
+# Label contract for the human-loop TWCS escalation labels (src/twcs/prompts.py in that repo).
+# Labels are LLM output (claude-opus-5) under that prompt; they are not human ground truth.
+schema_version: "1"
+contract_version: "twcs-1.0"
+name: twcs_escalation
+positive:
+  name: escalated
+  definition: >
+    Route to a human agent on arrival, judged from the customer's opening message only. One of seven
+    categories applies: an explicit request for a human or for support staff; a complaint that clears the
+    severity bar (profane judgment of the company, a global verdict, a churn declaration, a legal or
+    regulatory reference, or an allegation about staff conduct); a payment or billing error; a refund
+    demand or dispute; a cancellation-fee dispute; or an account lockout / registration blocker.
+  examples:
+    - "connect me to a person, your bot is useless"
+    - "charged twice for the same order, fix this"
+negative:
+  name: self_service
+  definition: >
+    Can be handled by an automated bot, self-service portal or FAQ: order and refund status lookups,
+    delivery questions, policy and fee information, standard password resets, profile changes, routine
+    orders and cancellations before shipping, greetings and thanks, bug reports and outage questions
+    without a severity trigger, and messages too short or vague to classify.
+  examples:
+    - "where is my order?"
+    - "is sign-in down for anyone else?"
+ambiguous_cases:
+  - "Frustration without a concrete trigger ('still waiting', 'third time asking') is 0 unless clearly severe."
+  - "A firm objection to one incident ('this is unacceptable') is 0; a global verdict ('worst service ever') is 1."
+  - "Profanity as an adjective ('this f*cking glitch') is 0; profanity naming the company as the bad thing is 1."
+  - "'where is my refund?' is 0 (track_refund); 'I want my money back' is 1 (get_refund)."
+  - "Too short or vague to classify: prefer 0."
+categories:
+  allowed: [contact_human_agent, contact_customer_service, complaint, payment_issue, get_refund, check_cancellation_fee, registration_problems, self_service]
+  required: true
+classification_threshold:
+  # Replication protocol: every reported figure in human-loop uses a fixed 0.5 cut-off.
+  objective: fixed
+  fixed_threshold: 0.5
+routing_policy:
+  objective: max_coverage
+  max_auto_error_rate: 0.10
+  max_missed_positive_rate: 0.10
+  min_band_width: 0.0
+  fallback: review

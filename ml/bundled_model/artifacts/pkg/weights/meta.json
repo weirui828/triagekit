@@ -1,0 +1,1 @@
+{"kind": "tfidf_lr", "params": {}, "seed": 42, "device": "cpu", "preprocessing": {"lowercase": true, "collapse_whitespace": true, "strip_urls": false, "max_chars": 2000}}

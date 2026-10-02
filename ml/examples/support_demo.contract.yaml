@@ -1,0 +1,46 @@
+schema_version: "1"
+contract_version: "1.0"
+name: support_demo
+positive:
+  name: needs_human
+  definition: >
+    The customer message requires a human agent: a complaint, refund/chargeback dispute, account security or
+    fraud concern, legal or regulatory threat, explicit request for a person, or a problem an automated
+    response cannot safely resolve.
+  examples:
+    - "I was charged twice and want a refund now"
+    - "Someone logged into my account from another country"
+negative:
+  name: auto_handle
+  definition: >
+    Routine informational or transactional requests that a templated or automated reply can resolve:
+    order status, password reset instructions, store hours, shipping times, how-to questions.
+  examples:
+    - "Where is my order?"
+    - "How do I reset my password?"
+ambiguous_cases:
+  - "Mild frustration about a routine question is negative unless the customer asks for a person or a refund."
+  - "A repeated unresolved question is positive."
+categories:
+  allowed: [billing, shipping, account, technical, general]
+  required: false
+classification_threshold:
+  objective: max_macro_f1
+  min_positive_recall: 0.8
+routing_policy:
+  objective: max_coverage
+  max_auto_error_rate: 0.10
+  max_missed_positive_rate: 0.10
+  min_band_width: 0.2
+  # Optional second tier for the uncertainty band: explicit keyword rules. No match -> human review.
+  second_tier: rule
+  rules:
+    - name: asks_for_human
+      label: 1
+      category: general
+      patterns: ['\b(human|real person|agent|manager|supervisor)\b']
+    - name: fraud_or_hacked
+      label: 1
+      category: account
+      patterns: ['\bhacked\b', '\bfraud\b', 'unauthori[sz]ed']
+  fallback: review

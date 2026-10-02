@@ -1,0 +1,33 @@
+@import "./theme.css";
+
+html { font-family: var(--font-sans); background: var(--color-surface-base); color: var(--color-fg-default); }
+body { margin: 0; }
+main { padding: 20px 24px 60px; max-width: 1100px; }
+.nav { display: flex; gap: 18px; align-items: center; padding: 10px 24px; border-bottom: 1px solid var(--color-border-default); background: var(--color-surface-raised); box-shadow: var(--shadow-xs); }
+.nav a { text-decoration: none; color: var(--color-fg-muted); font-weight: 500; } .nav a:hover { color: var(--color-accent-fg); }
+.nav .brand { font-weight: 700; margin-right: 12px; color: var(--color-accent-default); }
+h1 { font-size: 22px; margin: 8px 0 14px; } h2 { font-size: 16px; margin: 22px 0 8px; } h3 { font-size: 14px; margin: 14px 0 6px; }
+a { color: var(--color-accent-fg); }
+code, pre, textarea.mono, input.mono { font-family: var(--font-mono); font-size: 12.5px; }
+pre { background: var(--color-surface-sunken); border: 1px solid var(--color-border-subtle); padding: 10px; overflow-x: auto; border-radius: var(--radius-md); max-height: 360px; }
+table { border-collapse: collapse; width: 100%; font-size: 13px; }
+td, th { padding: 6px 8px; text-align: left; border-bottom: 1px solid var(--color-border-subtle); vertical-align: top; }
+th { font-weight: 600; color: var(--color-fg-muted); font-size: 12px; text-transform: uppercase; letter-spacing: .02em; }
+button { padding: 6px 12px; border: 1px solid var(--color-border-default); border-radius: var(--radius-md); background: var(--color-surface-raised); color: var(--color-fg-default); cursor: pointer; font: inherit; box-shadow: var(--shadow-xs); }
+button:hover { border-color: var(--color-border-strong); } button:disabled { opacity: .5; cursor: default; }
+button.primary { background: var(--color-accent-default); color: var(--color-fg-on-accent); border-color: var(--color-accent-default); } button.primary:hover { background: var(--color-accent-hover); }
+button.pos { background: var(--color-danger-default); color: var(--color-fg-on-accent); border-color: var(--color-danger-default); } button.pos:hover { background: var(--color-danger-hover); }
+button.neg { background: var(--color-success-default); color: var(--color-fg-on-accent); border-color: var(--color-success-default); }
+input, select, textarea { font: inherit; padding: 6px 8px; border: 1px solid var(--color-border-control); border-radius: var(--radius-md); background: var(--color-surface-raised); color: var(--color-fg-default); }
+input:focus, select:focus, textarea:focus { outline: 2px solid var(--color-accent-muted); outline-offset: 1px; border-color: var(--color-accent-default); }
+textarea { width: 100%; box-sizing: border-box; }
+.row { display: flex; gap: 10px; flex-wrap: wrap; align-items: center; margin: 8px 0; }
+.card { background: var(--color-surface-raised); border: 1px solid var(--color-border-default); border-radius: var(--radius-lg); padding: 12px 14px; margin: 10px 0; box-shadow: var(--shadow-sm); }
+.grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: 12px; }
+.err { color: var(--color-danger-fg); } .info { color: var(--color-success-fg); } .muted { color: var(--color-fg-subtle); font-size: 12.5px; }
+.pill { display: inline-block; padding: 1px 8px; border-radius: var(--radius-full); font-size: 12px; background: var(--color-surface-sunken); color: var(--color-fg-muted); border: 1px solid var(--color-border-subtle); text-decoration: none; }
+.pill.escalate { background: var(--color-danger-subtle); color: var(--color-danger-fg); border-color: transparent; }
+.pill.auto_handle { background: var(--color-success-subtle); color: var(--color-success-fg); border-color: transparent; }
+.pill.review { background: var(--color-warning-subtle); color: var(--color-warning-fg); border-color: transparent; }
+.bars { display: flex; align-items: flex-end; gap: 3px; height: 80px; } .bars div { flex: 1; background: var(--color-accent-default); min-height: 1px; border-radius: 2px 2px 0 0; } .bars.ref div { background: var(--color-border-strong); }
+.text { white-space: pre-wrap; font-size: 15px; padding: 12px; background: var(--color-surface-sunken); border: 1px solid var(--color-border-subtle); border-radius: var(--radius-md); }
